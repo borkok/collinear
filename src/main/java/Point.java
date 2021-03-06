@@ -69,7 +69,9 @@ public class Point implements Comparable<Point> {
 		if (hasSameY(that)) {
 			return 0.0d;
 		}
-		return 0.1d;
+		double dy = 1.0d * (that.y - this.y);
+		double dx = 1.0d * (that.x - this.x);
+		return dy / dx;
 	}
 
 	private boolean hasSameX(Point that) {

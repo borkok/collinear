@@ -7,12 +7,14 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PointTest {
-	/**
-	 * 	 * Returns the slope between this point and the specified point.
-	 * 	 * Formally, if the two points are (x0, y0) and (x1, y1), then the slope
-	 * 	 * is (y1 - y0) / (x1 - x0). For completeness, the slope is defined to be
-	 * 	 * +0.0 if the line segment connecting the two points is horizontal;
-	 */
+
+	@Test
+	public void slopeTo() {
+		Point testee = new Point(1, 1);
+		Point other = new Point(3, 2);
+		assertThat(testee.slopeTo(other)).isEqualTo(0.5d);
+	}
+
 	@Test
 	public void slopeTo_horizontalLine() {
 		Point testee = new Point(1, 1);
