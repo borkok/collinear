@@ -63,11 +63,25 @@ public class Point implements Comparable<Point> {
 		if (isEqualTo(that)) {
 			return Double.NEGATIVE_INFINITY;
 		}
-		return 0.0d;
+		if (hasSameX(that)) {
+			return Double.POSITIVE_INFINITY;
+		}
+		if (hasSameY(that)) {
+			return 0.0d;
+		}
+		return 0.1d;
+	}
+
+	private boolean hasSameX(Point that) {
+		return x == that.x;
+	}
+
+	private boolean hasSameY(Point that) {
+		return y == that.y;
 	}
 
 	private boolean isEqualTo(Point that) {
-		return x == that.x && y == that.y;
+		return hasSameX(that) && hasSameY(that);
 	}
 
 	/**
