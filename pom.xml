@@ -8,7 +8,7 @@
   <artifactId>collinear</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>queues</name>
+  <name>collinear</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
@@ -40,6 +40,11 @@
       <artifactId>lombok</artifactId>
       <version>1.18.16</version>
     </dependency>
+    <dependency>
+      <groupId>edu.princeton.cs.algs4</groupId>
+      <artifactId>algs4</artifactId>
+      <version>1.0.0</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -70,6 +75,21 @@
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
           <version>2.5.2</version>
+          <executions>
+            <execution>
+              <phase>initialize</phase>
+              <goals>
+                <goal>install-file</goal>
+              </goals>
+              <configuration>
+                <file>lib/algs4.jar</file>
+                <groupId>edu.princeton.cs.algs4</groupId>
+                <artifactId>algs4</artifactId>
+                <version>1.0.0</version>
+                <packaging>jar</packaging>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
