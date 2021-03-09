@@ -28,7 +28,15 @@ public class BruteCollinearPoints {
 	}
 
 	private void calculateLineSegments() {
-		segments = new LineSegment[0];
+		if (points.size() < 4) {
+			segments = new LineSegment[0];
+			return;
+		}
+		segments = new LineSegment[]{line(points.getFirst(), points.getLast())};
+	}
+
+	private LineSegment line(Point p1, Point p2) {
+		return new LineSegment(p1, p2);
 	}
 
 	// the number of line segments
@@ -73,6 +81,18 @@ public class BruteCollinearPoints {
 			if (previous.compareTo(current) == 0) {
 				throw new IllegalArgumentException();
 			}
+		}
+
+		public int size() {
+			return points.length;
+		}
+
+		public Point getFirst() {
+			return points[0];
+		}
+
+		public Point getLast() {
+			return points[size()-1];
 		}
 	}
 }
