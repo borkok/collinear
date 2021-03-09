@@ -60,4 +60,17 @@ public class LineSegment {
 	public int hashCode() {
 		throw new UnsupportedOperationException();
 	}
+
+	/**
+	 * Comment that before submission.
+	 * For unit testing purposes only.
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		LineSegment that = (LineSegment) o;
+		return p.compareTo(that.p) == 0 &&
+				q.compareTo(that.q) == 0;
+	}
 }
