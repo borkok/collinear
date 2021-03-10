@@ -32,31 +32,29 @@ class BruteCollinearPointsTest {
 				,Arguments.of(asList(xy(1,1),xy(2,2),xy(3,3),xy(4,4)), singletonList(line(xy(1, 1), xy(4, 4))))
 				,Arguments.of(asList(xy(1,1),xy(2,2),xy(4,4),xy(3,3)), singletonList(line(xy(1, 1), xy(4, 4))))
 				,Arguments.of(asList(xy(1,1),xy(-2,-2),xy(3,3),xy(4,4)), singletonList(line(xy(-2, -2), xy(4, 4))))
-//				,Arguments.of(asList(xy(1,1),xy(2,2),xy(3,3),xy(4,4),xy(5,6)), singletonList(line(xy(1, 1), xy(4, 4))))
-//				,Arguments.of(asList(xy(1,1),xy(2,2),xy(3,3),xy(1,2)), Collections.EMPTY_LIST)
-//
-/*
+				,Arguments.of(asList(xy(1,1),xy(2,2),xy(3,3),xy(4,4),xy(5,6)), singletonList(line(xy(1, 1), xy(4, 4))))
+				,Arguments.of(asList(xy(1,1),xy(2,2),xy(3,3),xy(1,2)), Collections.EMPTY_LIST)
+
 				,Arguments.of(asList(
 								xy(1,1),xy(2,2),xy(3,3),xy(4,4),
 								xy(0,2),xy(2,0),xy(3,-1),
-								xy(2,5)
+								xy(2,5))
 							,asList(
 								line(xy(1, 1), xy(4, 4)),
 								line(xy(3, -1), xy(0, 2))
 							)
 				)
-*/
-				/*
+
 				,Arguments.of(asList(
-								xy(1,1),xy(2,2),xy(3,3),xy(4,4),
-								xy(1,0),xy(3,1),xy(5,2),xy(-1,-1),
-								xy(2,5)
+								xy(7,3),xy(1,0),
+								xy(1,1),xy(2,2),
+								xy(3,3),xy(4,4),
+								xy(3,1),xy(5,2),
+								xy(2,5))
 							,asList(
 								line(xy(1, 1), xy(4, 4)),
-								line(xy(-1, -1), xy(5, 2))
-							)
+								line(xy(1, 0), xy(7, 3)))
 				)
-*/
 		);
 	}
 

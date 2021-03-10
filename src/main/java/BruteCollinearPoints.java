@@ -32,16 +32,16 @@ public class BruteCollinearPoints {
 		if (points.size() < 4) {
 			return;
 		}
-/*		for (int i = 0; i < points.size(); i++) {
-			for (int j = 0; j < points.size(); j++) {
-				for (int k = 0; k < points.size(); k++) {
-					for (int l = 0; l < points.size(); l++) {
-
+		//N4 complexity
+		for (int i = 0; i < points.size(); i++) {
+			for (int j = i+1; j < points.size(); j++) {
+				for (int k = j+1; k < points.size(); k++) {
+					for (int l = k+1; l < points.size(); l++) {
+						segments.tryAdding(points.get(i), points.get(j), points.get(k), points.get(l));
 					}
 				}
 			}
-		}*/
-		segments.add(line(points.getFirst(), points.getLast()));
+		}
 	}
 
 	private LineSegment line(Point p1, Point p2) {
@@ -58,6 +58,10 @@ public class BruteCollinearPoints {
 		return segments.getSegments();
 	}
 
+
+	/**
+	 * Points collection
+	 */
 	private static class Points {
 		private final Point[] points;
 
@@ -103,8 +107,15 @@ public class BruteCollinearPoints {
 		public Point getLast() {
 			return points[size()-1];
 		}
+
+		public Point get(int i) {
+			return points[i];
+		}
 	}
 
+	/**
+	 * Line segments collection
+	 */
 	private static class LineSegments {
 		private LineSegment[] segments = new LineSegment[10];
 		private int size = 0;
@@ -143,7 +154,6 @@ public class BruteCollinearPoints {
 			for (int i = 0; i < segments.length; i++) {
 				lineSegments[i] = segments[i];
 			}
-			size *= 2;
 			segments = lineSegments;
 		}
 	}
