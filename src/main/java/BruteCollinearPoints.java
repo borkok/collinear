@@ -16,7 +16,7 @@ import java.util.Arrays;
 public class BruteCollinearPoints {
 
 	private final Points points;
-	private LineSegment[] segments;
+	private LineSegments segments;
 
 	// finds all line segments containing 4 points
 	public BruteCollinearPoints(Point[] points) {
@@ -28,11 +28,20 @@ public class BruteCollinearPoints {
 	}
 
 	private void calculateLineSegments() {
+		segments = new LineSegments();
 		if (points.size() < 4) {
-			segments = new LineSegment[0];
 			return;
 		}
-		segments = new LineSegment[]{line(points.getFirst(), points.getLast())};
+/*		for (int i = 0; i < points.size(); i++) {
+			for (int j = 0; j < points.size(); j++) {
+				for (int k = 0; k < points.size(); k++) {
+					for (int l = 0; l < points.size(); l++) {
+
+					}
+				}
+			}
+		}*/
+		segments.add(line(points.getFirst(), points.getLast()));
 	}
 
 	private LineSegment line(Point p1, Point p2) {
@@ -41,12 +50,12 @@ public class BruteCollinearPoints {
 
 	// the number of line segments
 	public int numberOfSegments() {
-		return segments.length;
+		return segments.getSize();
 	}
 
 	// the line segments
 	public LineSegment[] segments() {
-		return segments;
+		return segments.getSegments();
 	}
 
 	private static class Points {
@@ -93,6 +102,49 @@ public class BruteCollinearPoints {
 
 		public Point getLast() {
 			return points[size()-1];
+		}
+	}
+
+	private static class LineSegments {
+		private LineSegment[] segments = new LineSegment[10];
+		private int size = 0;
+
+		public LineSegment[] getSegments() {
+			return copySegments();
+		}
+
+		public int getSize() {
+			return size;
+		}
+
+		private LineSegment[] copySegments() {
+			LineSegment[] lineSegments = new LineSegment[size];
+			for (int i = 0; i < size; i++) {
+				lineSegments[i] = segments[i];
+			}
+			return lineSegments;
+		}
+
+		public void tryAdding(Point p, Point q, Point r, Point s) {
+			if (p.slopeTo(q) == p.slopeTo(r) && p.slopeTo(r) == p.slopeTo(s)) {
+				add(new LineSegment(p,s));
+			}
+		}
+
+		private void add(LineSegment lineSegment) {
+			if (segments.length == size) {
+				increaseSize();
+			}
+			segments[size++] = lineSegment;
+		}
+
+		private void increaseSize() {
+			LineSegment[] lineSegments = new LineSegment[size * 2];
+			for (int i = 0; i < segments.length; i++) {
+				lineSegments[i] = segments[i];
+			}
+			size *= 2;
+			segments = lineSegments;
 		}
 	}
 }
