@@ -100,14 +100,6 @@ public class BruteCollinearPoints {
 			return points.length;
 		}
 
-		public Point getFirst() {
-			return points[0];
-		}
-
-		public Point getLast() {
-			return points[size()-1];
-		}
-
 		public Point get(int i) {
 			return points[i];
 		}
