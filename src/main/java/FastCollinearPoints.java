@@ -21,7 +21,7 @@ import java.util.Comparator;
  */
 public class FastCollinearPoints {
 	private final Points points;
-	private Segments segments;
+	private final Segments segments;
 
 	/**
 	 * Finds all line segments containing 4 or more points
@@ -54,24 +54,24 @@ public class FastCollinearPoints {
 	private void calculateLineSegmentsForPoint(int i) {
 		Point thePoint = points.get(i);
 		Comparator<Point> comparator = thePoint.slopeOrder();
-		Points pointsClone = points.cloneWithout(i);
-		pointsClone.sort(comparator);
-		calculateLineSegmentsFor(thePoint, pointsClone);
+		Points pointsSubset = points.subsetFromIncluding(i+1);
+		pointsSubset.sort(comparator);
+		calculateLineSegmentsFor(thePoint, pointsSubset);
 	}
 
-	private void calculateLineSegmentsFor(Point thePoint, Points pointsClone) {
+	private void calculateLineSegmentsFor(Point thePoint, Points pointsToCheck) {
 		int start = 0;
 		int end = start + 2;
-		while (start < pointsClone.oneBeforeLastIndex()) {
-			if (pointsClone.isSlopeToPointNotEqual(thePoint, start, end)) {
+		while (start < pointsToCheck.oneBeforeLastIndex()) {
+			if (pointsToCheck.isSlopeToPointNotEqual(thePoint, start, end)) {
 				start++; end++;
 				continue;
 			}
 			int lastGood = end;
-			while (end < pointsClone.lastIndex() && pointsClone.isSlopeToPointEqual(thePoint, start, end)) {
+			while (end < pointsToCheck.lastIndex() && pointsToCheck.isSlopeToPointEqual(thePoint, start, end)) {
 				lastGood = end++;
 			}
-			segments.addSegment(thePoint, pointsClone.get(start), pointsClone.get(lastGood));
+			segments.addSegment(thePoint, pointsToCheck.get(start), pointsToCheck.get(lastGood));
 			start = lastGood + 1;
 			end = start + 2;
 		}
@@ -95,9 +95,9 @@ public class FastCollinearPoints {
 	}
 
 
-	/**
+	/****************************************************************************
 	 * Points collection
-	 */
+	 ****************************************************************************/
 	private static class Points {
 		private Point[] points;
 
@@ -143,11 +143,11 @@ public class FastCollinearPoints {
 			return points[i];
 		}
 
-		public Points cloneWithout(int omitMe) {
+		public Points subsetFromIncluding(int from) {
 			Points clone = new Points();
-			int newLen = size() - (omitMe + 1);
+			int newLen = size() - (from);
 			clone.points = new Point[newLen];
-			System.arraycopy(points,omitMe+1, clone.points, 0, newLen);
+			System.arraycopy(points, from, clone.points, 0, newLen);
 			return clone;
 		}
 
@@ -176,6 +176,11 @@ public class FastCollinearPoints {
 		}
 	}
 
+
+
+	/****************************************************************************
+	 * Segments collections
+	 *****************************************************************************/
 	private static class Segments {
 		private LineSegment[] segments;
 		private double[] slopes;
@@ -239,9 +244,9 @@ public class FastCollinearPoints {
 		}
 	}
 
-	/**
-	 * Merge sort
-	 */
+	/****************************************************************************
+	 * Merge Sort
+	 *****************************************************************************/
 	private static class MergeSort {
 		public static void sort(Point[] points, Comparator<Point> comparator) {
 			if (points == null || comparator == null || points.length < 1) {
@@ -279,6 +284,5 @@ public class FastCollinearPoints {
 				points[k++] = aux[i++];
 			}
 		}
-
 	}
 }
