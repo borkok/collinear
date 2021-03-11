@@ -61,7 +61,7 @@ public class BruteCollinearPoints {
 	private static class Points {
 		private final Point[] pointsArray;
 
-		Points(Point[] inPoints) {
+		private Points(Point[] inPoints) {
 			pointsArray = inPoints;
 			validate();
 		}
@@ -92,11 +92,11 @@ public class BruteCollinearPoints {
 			}
 		}
 
-		public int size() {
+		private int size() {
 			return pointsArray.length;
 		}
 
-		public Point get(int i) {
+		private Point get(int i) {
 			return pointsArray[i];
 		}
 	}
@@ -108,11 +108,11 @@ public class BruteCollinearPoints {
 		private LineSegment[] segments = new LineSegment[10];
 		private int size = 0;
 
-		public LineSegment[] getSegments() {
+		private LineSegment[] getSegments() {
 			return copySegments();
 		}
 
-		public int getSize() {
+		private int getSize() {
 			return size;
 		}
 
@@ -122,7 +122,7 @@ public class BruteCollinearPoints {
 			return lineSegments;
 		}
 
-		public void tryAdding(Point p, Point q, Point r, Point s) {
+		private void tryAdding(Point p, Point q, Point r, Point s) {
 			if (p.slopeTo(q) == p.slopeTo(r) && p.slopeTo(r) == p.slopeTo(s)) {
 				add(new LineSegment(p,s));
 			}

@@ -101,7 +101,7 @@ public class FastCollinearPoints {
 	private static class Points {
 		private Point[] pointsArray;
 
-		Points(Point[] inPoints) {
+		private Points(Point[] inPoints) {
 			pointsArray = inPoints;
 			validate();
 		}
@@ -135,15 +135,15 @@ public class FastCollinearPoints {
 			}
 		}
 
-		public int size() {
+		private int size() {
 			return pointsArray.length;
 		}
 
-		public Point get(int i) {
+		private Point get(int i) {
 			return pointsArray[i];
 		}
 
-		public Points subsetFromIncluding(int from) {
+		private Points subsetFromIncluding(int from) {
 			Points clone = new Points();
 			int newLen = size() - from;
 			clone.pointsArray = new Point[newLen];
@@ -151,7 +151,7 @@ public class FastCollinearPoints {
 			return clone;
 		}
 
-		public void sort(Comparator<Point> comparator) {
+		private void sort(Comparator<Point> comparator) {
 			MergeSort.sort(pointsArray,comparator);
 		}
 
@@ -191,7 +191,7 @@ public class FastCollinearPoints {
 			slopes = new double[10];
 		}
 
-		public LineSegment[] getSegments() {
+		private LineSegment[] getSegments() {
 			if (segmentsSize == segmentsArray.length) {
 				return segmentsArray;
 			}
@@ -200,11 +200,11 @@ public class FastCollinearPoints {
 			return segmentsCopy;
 		}
 
-		public int size() {
+		private int size() {
 			return segmentsSize;
 		}
 
-		public void addSegment(Point thePoint, Point firstPoint, Point lastPoint) {
+		private void addSegment(Point thePoint, Point firstPoint, Point lastPoint) {
 			double slope = firstPoint.slopeTo(lastPoint);
 			if (slopeExists(slope)) {
 				return;
@@ -248,7 +248,7 @@ public class FastCollinearPoints {
 	 * Merge Sort
 	 *****************************************************************************/
 	private static class MergeSort {
-		public static void sort(Point[] points, Comparator<Point> comparator) {
+		private static void sort(Point[] points, Comparator<Point> comparator) {
 			if (points == null || comparator == null || points.length < 1) {
 				throw new IllegalArgumentException();
 			}
