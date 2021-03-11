@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * Remarkably, it is possible to solve the problem much faster than the brute-force solution described above. Given a point p,
@@ -57,11 +58,14 @@ public class FastCollinearPoints {
 	 * Points collection
 	 */
 	private static class Points {
-		private final Point[] points;
+		private Point[] points;
 
 		Points(Point[] inPoints) {
 			points = inPoints;
 			validate();
+		}
+
+		private Points() {
 		}
 
 		private void validate() {
@@ -97,5 +101,58 @@ public class FastCollinearPoints {
 		public Point get(int i) {
 			return points[i];
 		}
+
+		public Points cloneWithout(int omitMe) {
+			Points clone = new Points();
+			clone.points = new Point[size()-1];
+			for (int index = 0, cloneIndex = 0; index < size(); index++) {
+				if (index == omitMe) continue;
+				clone.points[cloneIndex++] = points[index];
+			}
+			return clone;
+		}
+	}
+
+	/**
+	 * Merge sort
+	 */
+	private static class MergeSort {
+		public static void sort(Point[] points, Comparator<Point> comparator) {
+			if (points == null || comparator == null || points.length < 1) {
+				throw new IllegalArgumentException();
+			}
+			Point[] aux = new Point[points.length];
+			sort(points, aux, 0, points.length-1, comparator);
+		}
+
+		private static void sort(Point[] points, Point[] aux, int lo, int hi, Comparator<Point> comparator) {
+			if (lo >= hi) {
+				return;
+			}
+			int mid = lo + (hi - lo) / 2;
+			sort(points, aux, lo, mid, comparator);
+			sort(points, aux, mid+1, hi, comparator);
+			System.arraycopy(points, lo, aux, lo, hi - lo + 1);
+			merge(points, aux, lo, mid, hi, comparator);
+		}
+
+		private static void merge(Point[] points, Point[] aux, int lo, int mid, int hi, Comparator<Point> comparator) {
+			int k = lo;
+			int i = lo, j = mid+1;
+			while (i <= mid && j <= hi) {
+				if (comparator.compare(aux[i], aux[j]) < 0) {
+					points[k++] = aux[i++];
+				} else {
+					points[k++] = aux[j++];
+				}
+			}
+			while (j <= hi) {
+				points[k++] = aux[j++];
+			}
+			while (i <= mid) {
+				points[k++] = aux[i++];
+			}
+		}
+
 	}
 }
