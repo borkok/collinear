@@ -44,10 +44,6 @@ public class BruteCollinearPoints {
 		}
 	}
 
-	private LineSegment line(Point p1, Point p2) {
-		return new LineSegment(p1, p2);
-	}
-
 	// the number of line segments
 	public int numberOfSegments() {
 		return segments.getSize();
@@ -63,16 +59,16 @@ public class BruteCollinearPoints {
 	 * Points collection
 	 */
 	private static class Points {
-		private final Point[] points;
+		private final Point[] pointsArray;
 
 		Points(Point[] inPoints) {
-			points = inPoints;
+			pointsArray = inPoints;
 			validate();
 		}
 
 		private void validate() {
 			sort();
-			for (int i = 0; i < points.length; i++) {
+			for (int i = 0; i < pointsArray.length; i++) {
 				if (i == 0) {
 					continue;
 				}
@@ -82,26 +78,26 @@ public class BruteCollinearPoints {
 
 		private void sort() {
 			try {
-				Arrays.sort(points);
-			} catch (Exception e) {
+				Arrays.sort(pointsArray);
+			} catch (NullPointerException e) {
 				throw new IllegalArgumentException();
 			}
 		}
 
 		private void checkAllPointsAreDistinct(int i) {
-			Point current = points[i];
-			Point previous = points[i - 1];
+			Point current = pointsArray[i];
+			Point previous = pointsArray[i - 1];
 			if (previous.compareTo(current) == 0) {
 				throw new IllegalArgumentException();
 			}
 		}
 
 		public int size() {
-			return points.length;
+			return pointsArray.length;
 		}
 
 		public Point get(int i) {
-			return points[i];
+			return pointsArray[i];
 		}
 	}
 
@@ -122,9 +118,7 @@ public class BruteCollinearPoints {
 
 		private LineSegment[] copySegments() {
 			LineSegment[] lineSegments = new LineSegment[size];
-			for (int i = 0; i < size; i++) {
-				lineSegments[i] = segments[i];
-			}
+			if (size >= 0) System.arraycopy(segments, 0, lineSegments, 0, size);
 			return lineSegments;
 		}
 
@@ -143,9 +137,7 @@ public class BruteCollinearPoints {
 
 		private void increaseSize() {
 			LineSegment[] lineSegments = new LineSegment[size * 2];
-			for (int i = 0; i < segments.length; i++) {
-				lineSegments[i] = segments[i];
-			}
+			System.arraycopy(segments, 0, lineSegments, 0, segments.length);
 			segments = lineSegments;
 		}
 	}

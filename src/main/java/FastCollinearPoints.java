@@ -99,10 +99,10 @@ public class FastCollinearPoints {
 	 * Points collection
 	 ****************************************************************************/
 	private static class Points {
-		private Point[] points;
+		private Point[] pointsArray;
 
 		Points(Point[] inPoints) {
-			points = inPoints;
+			pointsArray = inPoints;
 			validate();
 		}
 
@@ -111,7 +111,7 @@ public class FastCollinearPoints {
 
 		private void validate() {
 			sort();
-			for (int i = 0; i < points.length; i++) {
+			for (int i = 0; i < pointsArray.length; i++) {
 				if (i == 0) {
 					continue;
 				}
@@ -121,38 +121,38 @@ public class FastCollinearPoints {
 
 		private void sort() {
 			try {
-				Arrays.sort(points);
-			} catch (Exception e) {
+				Arrays.sort(pointsArray);
+			} catch (NullPointerException e) {
 				throw new IllegalArgumentException();
 			}
 		}
 
 		private void checkAllPointsAreDistinct(int i) {
-			Point current = points[i];
-			Point previous = points[i - 1];
+			Point current = pointsArray[i];
+			Point previous = pointsArray[i - 1];
 			if (previous.compareTo(current) == 0) {
 				throw new IllegalArgumentException();
 			}
 		}
 
 		public int size() {
-			return points.length;
+			return pointsArray.length;
 		}
 
 		public Point get(int i) {
-			return points[i];
+			return pointsArray[i];
 		}
 
 		public Points subsetFromIncluding(int from) {
 			Points clone = new Points();
-			int newLen = size() - (from);
-			clone.points = new Point[newLen];
-			System.arraycopy(points, from, clone.points, 0, newLen);
+			int newLen = size() - from;
+			clone.pointsArray = new Point[newLen];
+			System.arraycopy(pointsArray, from, clone.pointsArray, 0, newLen);
 			return clone;
 		}
 
 		public void sort(Comparator<Point> comparator) {
-			MergeSort.sort(points,comparator);
+			MergeSort.sort(pointsArray,comparator);
 		}
 
 		private double findPointSlopeTo(Point thePoint, int point) {
@@ -182,21 +182,21 @@ public class FastCollinearPoints {
 	 * Segments collections
 	 *****************************************************************************/
 	private static class Segments {
-		private LineSegment[] segments;
+		private LineSegment[] segmentsArray;
 		private double[] slopes;
 		private int segmentsSize = 0;
 
 		private Segments() {
-			segments = new LineSegment[10];
+			segmentsArray = new LineSegment[10];
 			slopes = new double[10];
 		}
 
 		public LineSegment[] getSegments() {
-			if (segmentsSize == segments.length) {
-				return segments;
+			if (segmentsSize == segmentsArray.length) {
+				return segmentsArray;
 			}
 			LineSegment[] segmentsCopy = new LineSegment[segmentsSize];
-			System.arraycopy(segments, 0, segmentsCopy,0, segmentsSize);
+			System.arraycopy(segmentsArray, 0, segmentsCopy,0, segmentsSize);
 			return segmentsCopy;
 		}
 
@@ -230,15 +230,15 @@ public class FastCollinearPoints {
 		}
 
 		private void addSegment(LineSegment lineSegment, double slope) {
-			if (segmentsSize == segments.length) {
-				LineSegment[] dest = new LineSegment[segments.length * 2];
-				System.arraycopy(segments, 0, dest, 0, segmentsSize);
-				segments = dest;
+			if (segmentsSize == segmentsArray.length) {
+				LineSegment[] dest = new LineSegment[segmentsArray.length * 2];
+				System.arraycopy(segmentsArray, 0, dest, 0, segmentsSize);
+				segmentsArray = dest;
 				double[] destSlopes = new double[slopes.length * 2];
 				System.arraycopy(slopes, 0, destSlopes, 0, segmentsSize);
 				slopes = destSlopes;
 			}
-			segments[segmentsSize] = lineSegment;
+			segmentsArray[segmentsSize] = lineSegment;
 			slopes[segmentsSize] = slope;
 			segmentsSize++;
 		}
@@ -269,7 +269,8 @@ public class FastCollinearPoints {
 
 		private static void merge(Point[] points, Point[] aux, int lo, int mid, int hi, Comparator<Point> comparator) {
 			int k = lo;
-			int i = lo, j = mid+1;
+			int i = lo;
+			int j = mid+1;
 			while (i <= mid && j <= hi) {
 				if (comparator.compare(aux[i], aux[j]) <= 0) {
 					points[k++] = aux[i++];
