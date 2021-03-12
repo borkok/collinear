@@ -25,7 +25,6 @@ class FastCollinearPointsTest {
 				.isInstanceOf(IllegalArgumentException.class);
 	}
 
-
 	private static Stream<Arguments> segments() {
 		return Stream.of(
 				Arguments.of(Collections.EMPTY_LIST, Collections.EMPTY_LIST)
@@ -61,14 +60,6 @@ class FastCollinearPointsTest {
 		);
 	}
 
-	private static LineSegment line(Point p1, Point p2) {
-		return new LineSegment(p1, p2);
-	}
-
-	private static Point xy(int x, int y) {
-		return new Point(x, y);
-	}
-
 	@ParameterizedTest
 	@MethodSource("segments")
 	public void calculates_segments(List<Point> points, List<LineSegment> expectedSegments) {
@@ -78,6 +69,60 @@ class FastCollinearPointsTest {
 		assertThat(testee.segments())
 				.containsExactlyInAnyOrder(expectedSegments.toArray(new LineSegment[0]));
 		assertThat(testee.numberOfSegments()).isEqualTo(expectedSegments.size());
+	}
+
+
+
+	private static Stream<Arguments> autograder() {
+		return Stream.of(
+				//equidistant
+				Arguments.of(asList(
+						xy(10000,0),
+						xy(8000,2000),
+						xy(2000,8000),
+						xy(0,10000),
+
+						xy(20000,0),
+						xy(18000,2000),
+						xy(2000,18000),
+
+						xy(10000,20000),
+						xy(30000,0),
+						xy(0,30000),
+						xy(20000,10000),
+
+						xy(13000,0),
+						xy(11000,3000),
+						xy(5000,12000),
+						xy(9000,6000)
+						)
+						,asList(
+								line(xy(10000,0), xy(0,10000)),
+								line(xy(10000,0), xy(30000, 0)),
+								line(xy(30000,0), xy(0,30000)),
+								line(xy(13000,0), xy(5000,12000))
+						))
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("autograder")
+	public void calculates_autograder(List<Point> points, List<LineSegment> expectedSegments) {
+		//WHEN
+		FastCollinearPoints testee = new FastCollinearPoints(points.toArray(new Point[0]));
+		//THEN
+		assertThat(testee.segments())
+				.containsExactlyInAnyOrder(expectedSegments.toArray(new LineSegment[0]));
+		assertThat(testee.numberOfSegments()).isEqualTo(expectedSegments.size());
+	}
+
+
+	private static LineSegment line(Point p1, Point p2) {
+		return new LineSegment(p1, p2);
+	}
+
+	private static Point xy(int x, int y) {
+		return new Point(x, y);
 	}
 
 	//needs merge sort with comparator implementation
