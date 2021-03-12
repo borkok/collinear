@@ -52,14 +52,13 @@ public class FastCollinearPoints {
 	}
 
 	private void calculateLineSegmentsForPoint(int i) {
-		Point thePoint = points.get(i);
-		Comparator<Point> comparator = thePoint.slopeOrder();
+		MyPoint thePoint = points.get(i);
 		Points pointsSubset = points.subsetFromIncluding(i+1);
-		pointsSubset.sort(comparator);
+		pointsSubset.sort(thePoint.comparator());
 		calculateLineSegmentsFor(thePoint, pointsSubset);
 	}
 
-	private void calculateLineSegmentsFor(Point thePoint, Points pointsToCheck) {
+	private void calculateLineSegmentsFor(MyPoint thePoint, Points pointsToCheck) {
 		int start = 0;
 		int end = start + 2;
 		while (start < pointsToCheck.oneBeforeLastIndex()) {
@@ -71,7 +70,7 @@ public class FastCollinearPoints {
 			while (end < pointsToCheck.lastIndex() && pointsToCheck.isSlopeToPointEqual(thePoint, start, end)) {
 				lastGood = end++;
 			}
-			segments.addSegment(thePoint, pointsToCheck.get(start), pointsToCheck.get(lastGood));
+			segments.addSegment(thePoint, pointsToCheck.getAllBetween(start, lastGood));
 			start = lastGood + 1;
 			end = start + 2;
 		}
@@ -99,18 +98,77 @@ public class FastCollinearPoints {
 	 * Points collection
 	 ****************************************************************************/
 	private static class Points {
-		private Point[] pointsArray;
+		private MyPoint[] myPointsArray;
 
 		private Points(Point[] inPoints) {
-			pointsArray = new Point[inPoints.length];
-			System.arraycopy(inPoints, 0, pointsArray, 0, inPoints.length);
-			validate();
+			Point[] pointsArray = new PointsValidator(inPoints).validate();
+			myPointsArray = new MyPoint[pointsArray.length];
+			for (int i = 0; i < pointsArray.length; i++) {
+				myPointsArray[i] = new MyPoint(pointsArray[i]);
+			}
 		}
 
 		private Points() {
 		}
 
-		private void validate() {
+		private int size() {
+			return myPointsArray.length;
+		}
+
+		private MyPoint get(int i) {
+			return myPointsArray[i];
+		}
+
+		private Points subsetFromIncluding(int from) {
+			Points clone = new Points();
+			int newLen = size() - from;
+			clone.myPointsArray = new MyPoint[newLen];
+			System.arraycopy(myPointsArray, from, clone.myPointsArray, 0, newLen);
+			return clone;
+		}
+
+		private void sort(Comparator<MyPoint> comparator) {
+			MergeSort.sort(myPointsArray, comparator);
+		}
+
+		private boolean isSlopeToPointNotEqual(MyPoint thePoint, int start, int end) {
+			return !isSlopeToPointEqual(thePoint, start, end);
+		}
+
+		private boolean isSlopeToPointEqual(MyPoint thePoint, int start, int end) {
+			return findPointSlopeTo(thePoint, start) == findPointSlopeTo(thePoint, end);
+		}
+
+		private double findPointSlopeTo(MyPoint thePoint, int point) {
+			return thePoint.slopeTo(get(point));
+		}
+
+		private int lastIndex() {
+			return size() - 1;
+		}
+
+		private int oneBeforeLastIndex() {
+			return size() - 2;
+		}
+
+		public MyPoint[] getAllBetween(int start, int lastGood) {
+			MyPoint[] result = new MyPoint[lastGood - start + 1];
+			for (int i = start, j = 0; i <= lastGood; i++) {
+				result[j++] = myPointsArray[i];
+			}
+			return result;
+		}
+	}
+
+	private static class PointsValidator {
+		private final Point[] pointsArray;
+
+		private PointsValidator(Point[] inPoints) {
+			pointsArray = new Point[inPoints.length];
+			System.arraycopy(inPoints, 0, pointsArray, 0, inPoints.length);
+		}
+
+		private Point[] validate() {
 			sort();
 			for (int i = 0; i < pointsArray.length; i++) {
 				if (pointsArray[i] == null) {
@@ -121,12 +179,14 @@ public class FastCollinearPoints {
 				}
 				checkAllPointsAreDistinct(i);
 			}
+			return pointsArray;
 		}
 
 		private void sort() {
 			try {
 				Arrays.sort(pointsArray);
-			} catch (NullPointerException e) {
+			}
+			catch (NullPointerException e) {
 				throw new IllegalArgumentException();
 			}
 		}
@@ -138,61 +198,58 @@ public class FastCollinearPoints {
 				throw new IllegalArgumentException();
 			}
 		}
-
-		private int size() {
-			return pointsArray.length;
-		}
-
-		private Point get(int i) {
-			return pointsArray[i];
-		}
-
-		private Points subsetFromIncluding(int from) {
-			Points clone = new Points();
-			int newLen = size() - from;
-			clone.pointsArray = new Point[newLen];
-			System.arraycopy(pointsArray, from, clone.pointsArray, 0, newLen);
-			return clone;
-		}
-
-		private void sort(Comparator<Point> comparator) {
-			MergeSort.sort(pointsArray,comparator);
-		}
-
-		private double findPointSlopeTo(Point thePoint, int point) {
-			return thePoint.slopeTo(get(point));
-		}
-
-		private boolean isSlopeToPointNotEqual(Point thePoint, int start, int end) {
-			return !isSlopeToPointEqual(thePoint, start, end);
-		}
-
-		private boolean isSlopeToPointEqual(Point thePoint, int start, int end) {
-			return findPointSlopeTo(thePoint, start) == findPointSlopeTo(thePoint, end);
-		}
-
-		private int lastIndex() {
-			return size() - 1;
-		}
-
-		private int oneBeforeLastIndex() {
-			return size() - 2;
-		}
 	}
 
+	/**
+	 * Point with info about segments that contain this point
+	 */
+	private static class MyPoint {
+		private final Point point;
+		private Point[] lastPointsInMySegments = new Point[1];
+		private int lastPointsSize = 0;
 
+		private MyPoint(Point point) {
+			this.point = point;
+		}
+
+		/**
+		 * Adds info about segment that contains this point.
+		 * @param lastPoint
+		 * @return true if segment already existed in collection and was not added, false if segment added
+		 */
+		private boolean addNewSegment(Point lastPoint) {
+			for (int i = 0; i < lastPointsSize; i++) {
+				if (lastPointsInMySegments[i].compareTo(lastPoint) == 0) {
+					return true;
+				}
+			}
+			if (lastPointsSize == lastPointsInMySegments.length) {
+				Point[] dest = new Point[lastPointsInMySegments.length * 2];
+				System.arraycopy(lastPointsInMySegments, 0, dest, 0, lastPointsSize);
+				lastPointsInMySegments = dest;
+			}
+			lastPointsInMySegments[lastPointsSize++] = lastPoint;
+			return false;
+		}
+
+		private Comparator<MyPoint> comparator() {
+			return (a,b) -> point.slopeOrder().compare(a.point, b.point);
+		}
+
+		public double slopeTo(MyPoint thatPoint) {
+			return this.point.slopeTo(thatPoint.point);
+		}
+	}
 
 	/****************************************************************************
 	 * Segments collections
 	 *****************************************************************************/
 	private static class Segments {
 		private LineSegment[] segmentsArray;
-		private double[] slopes;
 		private int segmentsSize = 0;
 
 		private Segments() {
 			segmentsArray = new LineSegment[10];
-			slopes = new double[10];
 		}
 
 		private LineSegment[] getSegments() {
@@ -208,43 +265,27 @@ public class FastCollinearPoints {
 			return segmentsSize;
 		}
 
-		private void addSegment(Point thePoint, Point firstPoint, Point lastPoint) {
-			double slope = firstPoint.slopeTo(lastPoint);
-			if (slopeExists(slope)) {
+		private void addSegment(MyPoint firstPoint, MyPoint[] segmentPoints) {
+			MyPoint lastPoint = segmentPoints[segmentPoints.length-1];
+			if(firstPoint.addNewSegment(lastPoint.point)) {
 				return;
 			}
-			LineSegment lineSegment = createLineSegment(thePoint, firstPoint, lastPoint);
-			addSegment(lineSegment, slope);
-		}
-
-		private boolean slopeExists(double slope) {
-			for (int i = 0; i < segmentsSize; i++) {
-				if (slopes[i] == slope) {
-					return true;
+			for (int i = 0; i < segmentPoints.length-1; i++) {
+				if(segmentPoints[i].addNewSegment(lastPoint.point)) {
+					return;
 				}
 			}
-			return false;
+			LineSegment lineSegment = new LineSegment(firstPoint.point, lastPoint.point);
+			addSegment(lineSegment);
 		}
 
-		private LineSegment createLineSegment(Point thePoint, Point firstPoint, Point lastPoint) {
-			if (firstPoint.compareTo(thePoint) < 0) {
-				return new LineSegment(firstPoint, lastPoint);
-			}
-			return new LineSegment(thePoint, lastPoint);
-		}
-
-		private void addSegment(LineSegment lineSegment, double slope) {
+		private void addSegment(LineSegment lineSegment) {
 			if (segmentsSize == segmentsArray.length) {
 				LineSegment[] dest = new LineSegment[segmentsArray.length * 2];
 				System.arraycopy(segmentsArray, 0, dest, 0, segmentsSize);
 				segmentsArray = dest;
-				double[] destSlopes = new double[slopes.length * 2];
-				System.arraycopy(slopes, 0, destSlopes, 0, segmentsSize);
-				slopes = destSlopes;
 			}
-			segmentsArray[segmentsSize] = lineSegment;
-			slopes[segmentsSize] = slope;
-			segmentsSize++;
+			segmentsArray[segmentsSize++] = lineSegment;
 		}
 	}
 
@@ -252,15 +293,15 @@ public class FastCollinearPoints {
 	 * Merge Sort
 	 *****************************************************************************/
 	private static class MergeSort {
-		private static void sort(Point[] points, Comparator<Point> comparator) {
+		private static void sort(MyPoint[] points, Comparator<MyPoint> comparator) {
 			if (points == null || comparator == null || points.length < 1) {
 				throw new IllegalArgumentException();
 			}
-			Point[] aux = new Point[points.length];
+			MyPoint[] aux = new MyPoint[points.length];
 			sort(points, aux, 0, points.length-1, comparator);
 		}
 
-		private static void sort(Point[] points, Point[] aux, int lo, int hi, Comparator<Point> comparator) {
+		private static void sort(MyPoint[] points, MyPoint[] aux, int lo, int hi, Comparator<MyPoint> comparator) {
 			if (lo >= hi) {
 				return;
 			}
@@ -271,7 +312,7 @@ public class FastCollinearPoints {
 			merge(points, aux, lo, mid, hi, comparator);
 		}
 
-		private static void merge(Point[] points, Point[] aux, int lo, int mid, int hi, Comparator<Point> comparator) {
+		private static void merge(MyPoint[] points, MyPoint[] aux, int lo, int mid, int hi, Comparator<MyPoint> comparator) {
 			int k = lo;
 			int i = lo;
 			int j = mid+1;
