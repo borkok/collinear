@@ -67,7 +67,7 @@ public class FastCollinearPoints {
 				continue;
 			}
 			int lastGood = end;
-			while (end < pointsToCheck.lastIndex() && pointsToCheck.isSlopeToPointEqual(thePoint, start, end)) {
+			while (end <= pointsToCheck.lastIndex() && pointsToCheck.isSlopeToPointEqual(thePoint, start, end)) {
 				lastGood = end++;
 			}
 			segments.addSegment(thePoint, pointsToCheck.getAllBetween(start, lastGood));
@@ -236,8 +236,12 @@ public class FastCollinearPoints {
 			return (a,b) -> point.slopeOrder().compare(a.point, b.point);
 		}
 
-		public double slopeTo(MyPoint thatPoint) {
+		private double slopeTo(MyPoint thatPoint) {
 			return this.point.slopeTo(thatPoint.point);
+		}
+
+		public String toString() {
+			return point.toString();
 		}
 	}
 
