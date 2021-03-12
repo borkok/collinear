@@ -17,6 +17,8 @@ class FastCollinearPointsTest {
 	public void init_invalidInputs() {
 		assertThatThrownBy(() -> new FastCollinearPoints(null))
 				.isInstanceOf(IllegalArgumentException.class);
+		assertThatThrownBy(() -> new FastCollinearPoints(new Point[]{null}))
+				.isInstanceOf(IllegalArgumentException.class);
 		assertThatThrownBy(() -> new FastCollinearPoints(new Point[]{xy(1,1), null}))
 				.isInstanceOf(IllegalArgumentException.class);
 		assertThatThrownBy(() -> new FastCollinearPoints(new Point[]{xy(1,1), xy(1,1)}))

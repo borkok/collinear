@@ -102,7 +102,8 @@ public class FastCollinearPoints {
 		private Point[] pointsArray;
 
 		private Points(Point[] inPoints) {
-			pointsArray = inPoints;
+			pointsArray = new Point[inPoints.length];
+			System.arraycopy(inPoints, 0, pointsArray, 0, inPoints.length);
 			validate();
 		}
 
@@ -112,6 +113,9 @@ public class FastCollinearPoints {
 		private void validate() {
 			sort();
 			for (int i = 0; i < pointsArray.length; i++) {
+				if (pointsArray[i] == null) {
+					throw new IllegalArgumentException();
+				}
 				if (i == 0) {
 					continue;
 				}
